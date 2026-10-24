@@ -1,0 +1,11 @@
+// Edit this file to sign the app with your own Apple ID. See README.md.
+
+// Your Apple team ID (Xcode > Settings > Accounts shows it). Leave empty to pick it in Xcode.
+DEVELOPMENT_TEAM =
+
+// Must be unique to you. Change "yourname" if Xcode says the identifier is taken.
+PRODUCT_BUNDLE_IDENTIFIER = com.yourname.ytcarplay
+
+// The CarPlay entitlement. Keep it for the Simulator, TrollStore, jailbreak, or an Apple-approved
+// developer account. A free Apple ID cannot sign it: set this to empty to install a phone-only build.
+YTCP_ENTITLEMENTS = YTCarPlay/YTCarPlay.entitlements
