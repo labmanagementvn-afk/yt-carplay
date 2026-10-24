@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build for the iOS Simulator
+        run: |
+          xcodebuild -project YTCarPlay.xcodeproj -target YTCarPlay \
+            -configuration Debug -sdk iphonesimulator \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: Build unsigned for iPhone
+        run: |
+          xcodebuild -project YTCarPlay.xcodeproj -target YTCarPlay \
+            -configuration Release -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: Package .tipa for TrollStore (with CarPlay entitlement) and .ipa for re-signing
+        run: |
+          brew install ldid
+          APP=build/Release-iphoneos/YTCarPlay.app
+          mkdir -p out/Payload
+          cp -R "$APP" out/Payload/
+          (cd out && zip -qry YTCarPlay-unsigned.ipa Payload)
+          ldid -SYTCarPlay/YTCarPlay.entitlements out/Payload/YTCarPlay.app/YTCarPlay
+          ldid -e out/Payload/YTCarPlay.app/YTCarPlay
+          (cd out && zip -qry YTCarPlay.tipa Payload)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YTCarPlay
+          path: |
+            out/YTCarPlay.tipa
+            out/YTCarPlay-unsigned.ipa
